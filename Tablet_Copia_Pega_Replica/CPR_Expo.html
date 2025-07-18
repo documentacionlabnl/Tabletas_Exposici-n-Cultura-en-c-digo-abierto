@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Copia Pega Replica</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    :root {
+      --color-background: #000CE2;
+      --color-text: #ffffff;
+      --color-border: #111111;
+      --color-accent: #ff0066;
+      --color-underline: #00b3ff;
+      --font-title: 'Aux Mono', monospace;
+    }
+
+    @font-face {
+      font-family: 'Aux Mono';
+      src: url('Font/AuxMono-Regular.ttf') format('truetype');
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--color-background);
+      color: var(--color-text);
+      font-family: 'Aux Mono', monospace;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      letter-spacing: 2px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .card {
+      border: 2px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      text-decoration: none;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: var(--color-accent);
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: auto;
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 2rem;
+    }
+
+    .underlined {
+      text-decoration: underline;
+      text-decoration-color: var(--color-underline);
+      text-underline-offset: 4px;
+    }
+
+    #viewer-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      margin: 2rem auto;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 600px;
+      background: #000;
+      border: 2px solid var(--color-border);
+      border-radius: 8px;
+    }
+
+    .viewer-controls {
+      margin-top: 1rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .viewer-controls button {
+      font-family: var(--font-title);
+      font-size: 1rem;
+      padding: 0.5rem 1.5rem;
+      background: var(--color-accent);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .viewer-controls button:hover {
+      background: var(--color-border);
+      color: var(--color-accent);
+    }
+
+    @media (max-width: 600px) {
+      main { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Copia Pega Replica</h1>
+  <p style="font-size:1.2rem; margin-top:1rem;">Modelos 3D utilizados para replicar prototipados en LABNL.</p>
+</header>
+
+<main>
+  <div class="card" data-model="Models/CALAFLHORA 1.glb" data-multiple="false">
+    <img src="images/Calhaflora.jpg" alt="Calhaflora">
+    <div class="card-title">Calhaflora</div>
+  </div>
+  <div class="card" data-multiple="true" data-models="Models/biogun1.glb,Models/biogun2.glb,Models/biogun3.glb,Models/biogun4.glb,Models/biogun5.glb,Models/biogun6.glb">
+    <img src="images/biogun.jpg" alt="Bio-Gun">
+    <div class="card-title">Bio-Gun</div>
+  </div>
+  <div class="card" data-multiple="true" data-models="Models/robot1.glb,Models/robot2.glb,Models/robot3.glb,Models/robot4.glb,Models/robot5.glb">
+    <img src="images/robot.jpg" alt="Ròbot Fantàstic">
+    <div class="card-title">Ròbot Fantàstic</div>
+  </div>
+</main>
+
+<div id="viewer-container">
+  <model-viewer id="model-viewer" camera-controls auto-rotate alt="Modelo 3D"></model-viewer>
+  <div class="viewer-controls">
+    <button id="reset-btn">Reiniciar</button>
+    <button id="next-model-btn" style="display: none;">Siguiente modelo</button>
+  </div>
+</div>
+
+<footer>
+  <span class="underlined">Cultura en Código Abierto</span>
+</footer>
+
+<script>
+  const viewer = document.getElementById('model-viewer');
+  const container = document.getElementById('viewer-container');
+  const resetBtn = document.getElementById('reset-btn');
+  const nextBtn = document.getElementById('next-model-btn');
+
+  let currentModels = [];
+  let currentIndex = 0;
+
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+      const isMultiple = card.dataset.multiple === 'true';
+
+      if (isMultiple) {
+        currentModels = card.dataset.models.split(',');
+        currentIndex = 0;
+        viewer.src = currentModels[currentIndex];
+        nextBtn.style.display = 'inline-block';
+      } else {
+        viewer.src = card.dataset.model;
+        currentModels = [];
+        nextBtn.style.display = 'none';
+      }
+
+      container.style.display = 'flex';
+      window.scrollTo({ top: container.offsetTop, behavior: 'smooth' });
+    });
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if (currentModels.length > 0) {
+      currentIndex = 0;
+      viewer.src = currentModels[currentIndex];
+    } else {
+      viewer.src = '';
+      container.style.display = 'none';
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % currentModels.length;
+    viewer.src = currentModels[currentIndex];
+  });
+</script>
+
+</body>
+</html>
